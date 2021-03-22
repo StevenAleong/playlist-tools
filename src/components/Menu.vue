@@ -24,26 +24,26 @@
                     Spotify
                 </div>
                                 
-                <div v-if="spotifyToken.length" class="group relative sidebar-item with-children">
+                <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
                     <router-link to="/spotify-playlist-tools" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
                         <IconBase iconName="random" iconClass="h-5 w-5 fill-current text-green-400 mr-1"><IconRandom /></IconBase>
                         Playlist Tools
                     </router-link>
                 </div>
 
-                <div v-if="spotifyToken.length" class="group relative sidebar-item with-children">
+                <!-- <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
                     <router-link to="/spotify-funneler" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
                         <IconBase iconName="funnel" iconClass="h-5 w-5 fill-current text-green-400 mr-1"><IconFunnel /></IconBase>
                         Funneler
                     </router-link>
                 </div>
 
-                <div v-if="spotifyToken.length" class="group relative sidebar-item with-children">
+                <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
                     <router-link to="/spotify-internet-radio" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
                         <IconBase iconName="radio" iconClass="h-5 w-5 fill-current text-green-400 mr-1"><IconRadio /></IconBase>
                         Internet Radio
                     </router-link>
-                </div>
+                </div> -->
                                 
                 <div class="group relative sidebar-item with-children">
                     <router-link to="/spotify-setup" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
@@ -131,7 +131,7 @@
         setup() {
             const store = useStore()
 
-            const spotifyToken = computed(() => store.state.spotity_Token)
+            const spotifyToken = computed(() => store.state.spotifyToken.accessToken)
 
             return {
                 spotifyToken

@@ -1,52 +1,62 @@
-import * as types from '../../mutation-types'
+import * as mutationTypes from '../../mutation-types'
+import * as getterTypes from '../../getter-types'
 import { Commit } from 'vuex'
-
-const spotifyScopes = 'playlist-modify-public playlist-modify-private playlist-read-private playlist-read-collaborative'
+import moment from 'moment'
 
 export interface Token {
-    access_token: string
-    token_type: string
-    scope: string
-    expires_in: number
-    refresh_token: string
+    accessToken: string
+    expiresOn: Date
+    refreshToken: string
 }
 
 const initState: Token = {
-    access_token: '',
-    token_type: '',
-    scope: spotifyScopes,
-    expires_in: 0,
-    refresh_token: ''
+    accessToken: '',
+    expiresOn: new Date(),
+    refreshToken: ''
 }
 
 const getters = {
-    getAccessToken (state: Token) {
-        return state.access_token
+    [getterTypes.GET_TOKEN_MINUTES_REMAINING] (state: Token) {
+        return moment(state.expiresOn).diff(moment(), 'minutes')
     },
 
-    getRefreshToken (state: Token) {
-        return state.refresh_token
+    [getterTypes.GET_TOKEN] (state: Token) {
+        return state.accessToken
     },
 
-    getExpiryTime (state: Token) {
-        return state.expires_in
+    [getterTypes.GET_REFRESH_TOKEN] (state: Token) {
+        return state.refreshToken
     }
     
 }
 
 const actions = {
-    refreshToken(context: { commit: Commit; state: Token }) {
 
-    }
 }
 
 const mutations = {
-    [types.SET_USER_TOKEN](state: Token, payload: Token) {
-        state = payload
+    [mutationTypes.SET_USER_TOKEN](state: Token, payload: Token) {
+        state.accessToken = payload.accessToken
+        state.refreshToken = payload.refreshToken
+        state.expiresOn = payload.expiresOn        
     },
 
-    [types.UPDATE_USER_TOKEN](state: Token, payload: string) {
-        state.access_token = payload
+    [mutationTypes.UPDATE_USER_TOKEN](state: Token, payload: Token) {
+        state.accessToken = payload.accessToken
+
+        if (payload.refreshToken !== '') {
+            state.refreshToken = payload.refreshToken
+        }
+
+        if (payload.expiresOn !== null) {
+            state.expiresOn = payload.expiresOn
+        }
+    },
+
+    [mutationTypes.LOG_USER_OUT](state: Token) {
+        state.accessToken = ''
+        state.refreshToken = '',
+        state.expiresOn = new Date()
     }
 }
 

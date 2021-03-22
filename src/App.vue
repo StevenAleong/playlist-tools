@@ -25,6 +25,9 @@
       Header,
       Menu,
       Title
+    },
+    setup() {
+      
     }
   })
 </script>

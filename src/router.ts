@@ -3,6 +3,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Overview from './pages/Overview.vue'
 import About from './pages/About.vue'
 
+import SpotifyPlaylistTools from './pages/spotify/PlaylistTools.vue'
 import SpotifySetup from './pages/spotify/Setup.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -12,7 +13,7 @@ const routes: Array<RouteRecordRaw> = [
     // ,{ path: '/scheduled', name: 'Scheduled', component: Scheduled, meta: { title: 'Scheduled' } }
     // ,{ path: '/settings', name: 'Settings', component: Settings, meta: { title: 'Settings' } }
 
-    // ,{ path: '/spotify-playlist-tools', name: 'SpotifyPlaylistTools', component: SpotifyPlaylistTools, meta: { title: 'Playlist Tools - Spotify' } }
+    ,{ path: '/spotify-playlist-tools', name: 'SpotifyPlaylistTools', component: SpotifyPlaylistTools, meta: { title: 'Playlist Tools - Spotify', requiresAuth: true } }
     // ,{ path: '/spotify-funneler', name: 'SpotifyFunneler', component: SpotifyFunneler, meta: { title: 'Funneler - Spotify' } }
     // ,{ path: '/spotify-internet-radio', name: 'SpotifyInternetRadio', component: SpotifyInternetRadio, meta: { title: 'Internet Radio - Spotify' } }
     // ,{ path: '/spotify-settings', name: 'spotifySettings', component: spotifySettings, meta: { title: 'Settings - Spotify' } }

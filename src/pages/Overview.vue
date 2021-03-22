@@ -1,8 +1,8 @@
 <template>
 
     <Block v-if="spotifyToken.length === 0" class="mb-4 bg-green-400 text-white font-bold">
-        You are not logged into Spotify.<br />
-        <router-link to="/spotify-setup" class="text-green-800 hover:text-green-700">Log into your Spotify account</router-link>
+        You are not logged into Spotify. To use this app, you need to authenticate/login through Spotify.<br />
+        <router-link to="/spotify-setup" class="text-green-800 hover:text-green-700">Log in using your Spotify account</router-link>
     </Block>
 
     <div class="grid gap-4 grid-cols-12 md:grid-cols-6 lg:grid-cols-4">
@@ -81,7 +81,7 @@
         setup() {
             const store = useStore()
 
-            const spotifyToken = computed(() => store.state.spotity_Token.access_token)
+            const spotifyToken = computed(() => store.state.spotifyToken.accessToken)
 
             return {
                 spotifyToken

@@ -1,18 +1,22 @@
 import Vue from 'vue'
 import { createStore, createLogger } from 'vuex'
 
-import spotify_userProfile from './modules/spotify/userProfile'
-import spotity_Token from './modules/spotify/token'
+import spotifyUserProfile from './modules/spotify/userProfile'
+import spotifyToken from './modules/spotify/token'
+import createPersistedState from "vuex-persistedstate";
 
 const debug = process.env.NODE_ENV !== 'production'
 
+const plugins = debug ? [createLogger({})] : []
+plugins.push(createPersistedState())
+
 export default createStore({
     modules: {
-        spotify_userProfile,
-        spotity_Token
+        spotifyUserProfile,
+        spotifyToken
     },
     strict: debug,
-    plugins: debug ? [createLogger()] : []
+    plugins: plugins
 })
 
 // import { createStore, createLogger } from 'vuex';

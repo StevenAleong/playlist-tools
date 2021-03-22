@@ -2,16 +2,9 @@
     <Block class="mb-3">
         <h2>Information about this tool</h2>
         <p>
-            This app was created because of the limitations that I was running into from the website version found at 
+            This app was created because I wanted to learn how to use different web technologies and also hoping to make it faster than the original version found at
             <a href="https://stevenaleong.com/tools/spotifyplaylistrandomizer" target="_blank">https://stevenaleong.com/tools/spotifyplaylistrandomizer</a>.
-        </p>  
-        <p>
-            I was asked multiple times if there was a way to schedule the shuffling among other
-            features that I could not implement into the tool without rebuilding it with all these
-            requests in mind.
-        </p>
-        <p>
-            This gave me an excuse to learn new technologies. This tool was built using VueJS and styled with TailWindCSS.
+            This tool was built using VueJS and styled with TailWindCSS.
         </p>
         <p>
             I didn't do the mobile responsiveness yet so it wont look great on that.
@@ -28,10 +21,11 @@
     <Block class="mb-3">
         <h2>Support</h2>
         <p>
-            I didn't build this app to sell. I built it because I was running into frustrations of Spotify. I got asked
-            once by someone if they could send some money to me which I honestly never expected. I just wanted to share the
-            tool that was originally created. I'm just happy people are using the tools and are letting me know! I do run 
-            ads on the pages but they ain't doing that much.
+            I didn't build this app to sell. I built this because I wanted to create a new version of my original shuffler. 
+            I got asked once by someone if they could send some money to me which I honestly never expected. 
+            I just wanted to share the tool that was originally created. 
+            I'm just happy people are using the tools and are letting me know! 
+            Sorry about the ads on the page, they are there to attempt to help with the hosting costs.
         </p>
         <p>
             I always love hearing from the people who are using it and just like seeing the messages left but if you're 
