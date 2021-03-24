@@ -1,13 +1,8 @@
 import * as mutationTypes from '../../mutation-types'
 import * as getterTypes from '../../getter-types'
+import { Token } from '../../../models'
 import { Commit } from 'vuex'
 import moment from 'moment'
-
-export interface Token {
-    accessToken: string
-    expiresOn: Date
-    refreshToken: string
-}
 
 const initState: Token = {
     accessToken: '',

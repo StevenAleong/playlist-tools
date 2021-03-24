@@ -3,6 +3,7 @@ import { createStore, createLogger } from 'vuex'
 
 import spotifyUserProfile from './modules/spotify/userProfile'
 import spotifyToken from './modules/spotify/token'
+import queue from './modules/queue'
 import createPersistedState from "vuex-persistedstate";
 
 const debug = process.env.NODE_ENV !== 'production'
@@ -12,6 +13,7 @@ plugins.push(createPersistedState())
 
 export default createStore({
     modules: {
+        queue,
         spotifyUserProfile,
         spotifyToken
     },

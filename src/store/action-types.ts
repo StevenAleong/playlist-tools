@@ -1,1 +1,1 @@
-export const UPDATE_TOKEN = 'UPDATE_TOKEN'
+export const PROCESS_QUEUE = 'PROCESS_QUEUE'

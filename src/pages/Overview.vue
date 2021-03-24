@@ -25,6 +25,34 @@
         </div>
     </div>
 
+    <div v-if="queue.queued.length > 0">
+        <h2 class="mb-3">Job Queue</h2>
+
+        <table  class="table-auto border-collapse border w-full">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500">Playlist Name</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500">Source</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500">Job</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 text-right"># Tracks</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="pl in queue.queued" :key="pl">
+                    <td class="px-5 py-2 whitespace-no-wrap border-b border-gray-500">{{pl.name}}</td>
+                    <td class="px-5 py-2 whitespace-no-wrap border-b border-gray-500">{{pl.source}}</td>
+                    <td class="px-5 py-2 whitespace-no-wrap border-b border-gray-500">{{pl.jobType}}</td>
+                    <td class="px-5 py-2 whitespace-no-wrap border-b border-gray-500 text-right">{{pl.totalTracks}}</td>
+                    <td class="px-5 py-2 whitespace-no-wrap border-b border-gray-500 text-right">
+                        <button title="Remove this job from queue" v-on:click="removeFromQueue(pl.uniqueId)">
+                            <IconBase iconName="cancel" iconClass="h-4 w-4 fill-current inline-block text-red-500"><IconCancel /></IconBase>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
     
 
     <!-- 
@@ -44,54 +72,43 @@
         [{{displaySourceType}}] {{displayJobType}} {{state.data.processing.name}} with {{state.data.processing.totalTracks}} tracks
     </ColourBlock>
 
-    <div v-if="this.state.data.jobQueue.length">
-        <h2 class="mb-3">Job Queue</h2>
-
-        <table  class="table-auto border-collapse border w-full">
-            <thead>
-                <tr>
-                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500">Playlist Name</th>
-                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500">Source</th>
-                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500">Job</th>
-                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 text-right"># Tracks</th>
-                    <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="pl in this.state.data.jobQueue" :key="pl">
-                    <td class="px-6 py-2 whitespace-no-wrap border-b border-gray-500">{{pl.name}}</td>
-                    <td class="px-6 py-2 whitespace-no-wrap border-b border-gray-500">{{pl.source}}</td>
-                    <td class="px-6 py-2 whitespace-no-wrap border-b border-gray-500">{{pl.jobType}}</td>
-                    <td class="px-6 py-2 whitespace-no-wrap border-b border-gray-500 text-right">{{pl.totalTracks}}</td>
-                    <td class="px-6 py-2 whitespace-no-wrap border-b border-gray-500 text-right"><button title="Remove this job from queue" v-on:click="removeFromQueue(pl.uniqueId)"><CancelIcon /></button></td>
-                </tr>
-            </tbody>
-        </table>
-    </div> -->
+     -->
 </template>
 
 <script>
     import { computed } from 'vue'
     import { useStore } from 'vuex'
     import { defineComponent } from 'vue'
-    //import { sources, jobTypes } from '../enums';
+    import * as mutationTypes from '../store/mutation-types'
+    import constants from '../constants'
+
+    import IconBase from '../components/IconBase.vue'
+    import IconCancel from '../components/icons/IconCancel.vue'
 
     export default defineComponent({
         name: 'Dashboard',
         setup() {
             const store = useStore()
 
+            const queue = computed(() => store.state.queue)
             const spotifyToken = computed(() => store.state.spotifyToken.accessToken)
 
             return {
-                spotifyToken
+                spotifyToken,
+                queue
             }
+        },
+        components: {
+            IconBase,
+            IconCancel
         },
         computed: {
             
         },
         methods: {
-            
+            removeFromQueue(uniqueId) {
+                this.$store.commit(constants.storeQueue + '/' + mutationTypes.REMOVE_JOB_FROM_QUEUE, uniqueId)
+            }
         }
     })
 </script>
