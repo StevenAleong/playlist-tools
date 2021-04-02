@@ -71,6 +71,9 @@ export async function getUserPlaylists(limit: number = 50, page: number = 1) {
     return spotifyApi.getUserPlaylists({ limit: limit, offset: offset })
 }
 
+let errorCount = 0;
+const maxErrorCount = 5;
+
 export async function processPlaylist(job: Job) {
     var spotifyApi = new SpotifyWebApi()
     spotifyApi.setAccessToken(await GetSpotifyToken())
@@ -82,113 +85,165 @@ export async function processPlaylist(job: Job) {
             appStore.commit(constants.storeQueue + '/' + mutationTypes.UPDATE_PROCESS_TRACK_COUNT, totalTracks)
             appStore.commit(constants.storeQueue + '/' + mutationTypes.SET_AS_PROCESSING)
 
+            errorCount = 0;
+
             if (job.jobType === JobTypes.SHUFFLE) {
                 var trackIndexes = Array.from(Array(totalTracks).keys())
                 trackIndexes = utilities.shuffle(trackIndexes)
 
-                moveTrack(job.playlistId, 0, trackIndexes)
+                shufflePlaylist(job.playlistId, 0, trackIndexes)
 
             } else if (job.jobType === JobTypes.REVERSE) {
+                reversePlaylist(job.playlistId, 0, true)
 
             }
 
         })
 }
-async function moveTrack(playlistId: string, index: number, trackIndexes: any[]) {
+
+
+async function shufflePlaylist(playlistId: string, index: number, trackIndexes: any[]) {
     var isCancelled = appStore.getters[constants.storeQueue + '/' + getterTypes.GET_IS_CANCELLED]
     var processingPlaylist = appStore.getters[constants.storeQueue + '/' + getterTypes.GET_PROCESSING]
 
-    if (processingPlaylist !== null && processingPlaylist !== undefined && isCancelled) {
+    if (processingPlaylist === null || processingPlaylist === undefined || isCancelled || errorCount > maxErrorCount) {
         appStore.commit(constants.storeQueue + '/' + mutationTypes.REMOVE_CURRENT_PROCESSING)
+        return
+    } 
+    
+    try {
+        var spotifyApi = new SpotifyWebApi()
+        spotifyApi.setAccessToken(await GetSpotifyToken())
 
-    } else {
-        try {
-            var spotifyApi = new SpotifyWebApi()
-            spotifyApi.setAccessToken(await GetSpotifyToken())
-    
-            var result = spotifyApi.reorderTracksInPlaylist(playlistId, index, trackIndexes[index], { })
-    
-            result                
-                .then(function(data) {
-                    if (data.statusCode === 200) {
-                        appStore.commit(constants.storeQueue + '/' + mutationTypes.UPDATE_PROGRESS, (index / trackIndexes.length) * 100)
-                        
-                        if ((index + 1) < trackIndexes.length) {
-                            moveTrack(playlistId, index + 1, trackIndexes);
-    
-                        } else {
-                            appStore.commit(constants.storeQueue + '/' + mutationTypes.REMOVE_CURRENT_PROCESSING)
-    
-                        }
+        var result = spotifyApi.reorderTracksInPlaylist(playlistId, index, trackIndexes[index], { })
+
+        result                
+            .then(function(data) {
+                if (data.statusCode === 200) {
+                    appStore.commit(constants.storeQueue + '/' + mutationTypes.UPDATE_PROGRESS, (index / trackIndexes.length) * 100)
+                    
+                    if ((index + 1) < trackIndexes.length) {
+                        shufflePlaylist(playlistId, index + 1, trackIndexes);
 
                     } else {
-                        setTimeout(function() {
-                            moveTrack(playlistId, index, trackIndexes)            
-                        }, 5000)
+                        appStore.commit(constants.storeQueue + '/' + mutationTypes.REMOVE_CURRENT_PROCESSING)
+
                     }
-                }, 
-                function(err) {
+
+                } else {
+                    errorCount++;
                     setTimeout(function() {
-                        moveTrack(playlistId, index, trackIndexes)            
+                        shufflePlaylist(playlistId, index, trackIndexes)            
                     }, 5000)
-                })
+                }
+            }, 
+            function(err) {
+                errorCount++;
+                setTimeout(function() {
+                    shufflePlaylist(playlistId, index, trackIndexes)            
+                }, 5000)
+            })
 
-        } catch (err) {
-            setTimeout(function() {
-                moveTrack(playlistId, index, trackIndexes)            
-            }, 5000)
-        }
-
-        
+    } catch (err) {
+        setTimeout(function() {
+            shufflePlaylist(playlistId, index, trackIndexes)            
+        }, 5000)
     }
 }
 
-// async function processSpotifyShuffleMoveTrack(playlistId: string, index: number, trackIndexes: any[]) {
-//     if (state.data.processing != null && state.data.processing.cancelProcessing === true) {
-//         state.clearProcessing();
-//         isProcessing = false;
+async function reversePlaylist(playlistId: string, index: number, forward: boolean) {
+    var isCancelled = appStore.getters[constants.storeQueue + '/' + getterTypes.GET_IS_CANCELLED]
+    var processingPlaylist = appStore.getters[constants.storeQueue + '/' + getterTypes.GET_PROCESSING]
 
-//     } else {
-//         console.log('Moving track ' + index + ' to position ' + trackIndexes[index]);
-//         try {
-//             var result = Spotify_movePlaylistTrack(playlistId, index, trackIndexes[index]);
-//             result.then(function(data) {
-//                 console.log(data);
-    
-//                 if (data.statusCode == 200) {
-//                     state.updateProcessingProgress((index / trackIndexes.length) * 100);
-    
-//                     if ((index + 1) < trackIndexes.length) {
-//                         processSpotifyShuffleMoveTrack(playlistId, index + 1, trackIndexes);
-    
-//                     } else {
-//                         state.clearProcessing();
-//                         isProcessing = false;
-    
-//                     }
-    
-//                 } else {
-//                     setTimeout(processSpotifyShuffleMoveTrack(playlistId, index, trackIndexes), 5000);
-//                 }
-    
-//             }, function(err) {
-//                 console.log(err);
-//                 setTimeout(processSpotifyShuffleMoveTrack(playlistId, index, trackIndexes), 5000);
-//             });
+    if (processingPlaylist === null || processingPlaylist === undefined || isCancelled || errorCount > maxErrorCount) {
+        appStore.commit(constants.storeQueue + '/' + mutationTypes.REMOVE_CURRENT_PROCESSING)
+        return
+    }
+
+    var totalTracks = processingPlaylist.totalTracks
+
+    try {
+        var spotifyApi = new SpotifyWebApi()
+        spotifyApi.setAccessToken(await GetSpotifyToken())
+
+        var fromSpot = forward ? index : totalTracks - index - 2,
+            toSpot = forward ? totalTracks - index : index
+
+        var result = spotifyApi.reorderTracksInPlaylist(playlistId, fromSpot, toSpot, { })
+
+        result
+            .then(function(data) {
+                if (data.statusCode == 200) {
+
+                    if (!forward) {
+                        if (index >= Math.floor(totalTracks / 2)) {
+                            appStore.commit(constants.storeQueue + '/' + mutationTypes.REMOVE_CURRENT_PROCESSING)
+                            return
+                        }
+                        
+                        appStore.commit(constants.storeQueue + '/' + mutationTypes.UPDATE_PROGRESS, (index / (totalTracks / 2)) * 100)
+                    }
+
+                    reversePlaylist(playlistId, forward ? index : index + 1, forward ? false : true)
+
+                } else {
+                    setTimeout(function() {
+                        reversePlaylist(playlistId, index, forward)            
+                    }, 5000)
+
+                }
+            },
+            function(err) {
+                errorCount++;
+                setTimeout(function() {
+                    reversePlaylist(playlistId, index, forward)            
+                }, 5000)
+
+            })
+
+
+        // if (forward) {
+        //     //console.log('Moving track from ' + index  + ' to ' + (totalTracks - index));
             
-//         } catch (err) {
-//             setTimeout(processSpotifyShuffleMoveTrack(playlistId, index, trackIndexes), 5000);
-    
-//         }
-//     }
-// }
 
-export async function shufflePlaylist() {
+        //     var result = Spotify_movePlaylistTrack(playlistId, index, totalTracks - index);
 
+        //     result.then(function(data) {
+        //         if (data.statusCode == 200) {
+        //             processSpotifyReverse(playlistId, index, false);
+        //         } else {
+        //             setTimeout(processSpotifyReverse(playlistId, index, forward), 5000);
+        //         }
+        //     });
 
-}
+        // } else {
+        //     console.log('Moving track from ' + (totalTracks - index - 2) + ' to ' + index);
+        //     var result2 = Spotify_movePlaylistTrack(playlistId, totalTracks - index - 2, index);
+        //     result2.then(function(data2) {
+        //         if (data2.statusCode == 200) {
 
-export async function reversePlaylist() {
-    var spotifyApi = new SpotifyWebApi()
-    var token = await GetSpotifyToken()
+        //             state.updateProcessingProgress((index / (totalTracks / 2)) * 100);
+
+        //             if (index < Math.floor(totalTracks / 2)) {
+        //                 processSpotifyReverse(playlistId, index + 1, true);
+
+        //             } else {
+        //                 state.clearProcessing();
+        //                 isProcessing = false;
+
+        //             }
+
+        //         } else {
+        //             setTimeout(processSpotifyReverse(playlistId, index, forward), 5000);
+        //         }
+        //     });
+        // }
+
+    } catch {
+        errorCount++;
+        setTimeout(function() {
+            reversePlaylist(playlistId, index, forward)            
+        }, 5000)
+    }
+
 }

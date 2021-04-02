@@ -1,4 +1,4 @@
-let stevenAleongRootUrl:string = process.env.NODE_ENV !== 'production' ? 'http://localhost:16122' : 'https://stevenaleong.com'
+let stevenAleongRootUrl:string = 'https://stevenaleong.com' //process.env.NODE_ENV !== 'production' ? 'http://localhost:16122' : 'https://stevenaleong.com'
 let storeSpotifyToken:string = 'spotifyToken'
 let storeQueue:string = 'queue'
 

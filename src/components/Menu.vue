@@ -31,12 +31,23 @@
                     </router-link>
                 </div>
 
-                <!-- <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
+                    
+                <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
+                    <router-link to="/spotify-playlist-tools" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
+                        <IconBase iconName="alarm" iconClass="h-5 w-5 fill-current text-green-400 mr-1"><IconAlarm /></IconBase>
+                        BPM Playlist 
+                    </router-link>
+                </div>
+
+                <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
                     <router-link to="/spotify-funneler" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
                         <IconBase iconName="funnel" iconClass="h-5 w-5 fill-current text-green-400 mr-1"><IconFunnel /></IconBase>
                         Funneler
                     </router-link>
                 </div>
+
+
+                <!-- 
 
                 <div v-if="spotifyToken.length > 0" class="group relative sidebar-item with-children">
                     <router-link to="/spotify-internet-radio" class="block flex items-center text-white text-center text-left shadow-light shadow-none no-underline py-2 px-4 hover:bg-black hover:text-white">
@@ -126,6 +137,7 @@
     import IconGear from './icons/IconGear.vue'
     import IconPanel from './icons/IconPanel.vue'
     import IconInfo from './icons/IconInfo.vue'
+    import IconAlarm from './icons/IconAlarm.vue'
 
     export default {
         setup() {
@@ -150,6 +162,7 @@
             IconFunnel,
             IconRadio,
             IconGear,
+            IconAlarm,
             IconPanel,
             IconInfo
         }
